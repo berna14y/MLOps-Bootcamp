@@ -1,7 +1,7 @@
 # 🚀 MLOps Bootcamp Projects
 
 Welcome to my **MLOps Bootcamp** repository!  
-This repository includes all **homeworks, mini-projects, and the final project** completed as part of an intensive, hands-on MLOps training program.
+This repository includes all homeworks completed as part of an intensive, hands-on Veri Bilimi Okulu MLOps Bootcamp.
 
 Throughout the bootcamp, I explored a wide range of topics — from Linux and Docker to model deployment with FastAPI, MLflow, Streamlit, Terraform, and Ansible. Each week's work builds toward mastering the end-to-end MLOps lifecycle.
 
@@ -54,15 +54,6 @@ Throughout the bootcamp, I explored a wide range of topics — from Linux and Do
 
 ---
 
-## 📁 Final Project (Bank Marketing Prediction)
-
-The final project integrates the full MLOps pipeline:
-- Data preprocessing, feature engineering, and model training (VotingClassifier).
-- Containerized **FastAPI** application deployed on **AWS EC2**.
-- Infrastructure provisioned via **Terraform** and configured with **Ansible**.
-- Swagger UI used for interactive testing.
-
----
 
 ## 🧰 Tools & Technologies
 
