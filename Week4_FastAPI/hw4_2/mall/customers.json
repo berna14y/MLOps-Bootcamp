@@ -1,0 +1,104 @@
+{
+    "customers": [
+      {
+        "customerFName": "Richard",
+        "customerLName": "Hernandez",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX",  
+        "customerStreet": "6303 Heather Plaza",
+        "customerCity": "Brownsville",
+        "customerState": "TX",
+        "customerZipcode": "78521"
+      },
+      {
+        "customerFName": "Mary",
+        "customerLName": "Barrett",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "9526 Noble Embers Ridge",
+        "customerCity": "Littleton",
+        "customerState": "CO",
+        "customerZipcode": "80126"
+      },
+      {
+        "customerFName": "Ann",
+        "customerLName": "Smith",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "3422 Blue Pioneer Bend",
+        "customerCity": "Caguas",
+        "customerState": "PR",
+        "customerZipcode": "00725"
+      },
+      {
+        "customerFName": "Mary",
+        "customerLName": "Jones",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "8324 Little Common",
+        "customerCity": "San Marcos",
+        "customerState": "CA",
+        "customerZipcode": "92069"
+      },
+      {
+        "customerFName": "Robert",
+        "customerLName": "Hudson",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "10 Crystal River Mall",
+        "customerCity": "Caguas",
+        "customerState": "PR",
+        "customerZipcode": "00725"
+      },
+      {
+        "customerFName": "Mary",
+        "customerLName": "Smith",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "3151 Sleepy Quail Promenade",
+        "customerCity": "Passaic",
+        "customerState": "NJ",
+        "customerZipcode": "07055"
+      },
+      {
+        "customerFName": "Melissa",
+        "customerLName": "Wilcox",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet":"9453 High Concession",
+        "customerCity": "Caguas",
+        "customerState": "PR",
+        "customerZipcode": "00725"
+      },
+      {
+        "customerFName": "Megan",
+        "customerLName": "Smith",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "3047 Foggy Forest Plaza",
+        "customerCity": "Lawrence",
+        "customerState": "MA",
+        "customerZipcode": "01841"
+      },
+      {
+        "customerFName": "Mary",
+        "customerLName": "Perez",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX", 
+        "customerStreet": "3616 Quaking Street",
+        "customerCity": "Caguas",
+        "customerState": "PR",
+        "customerZipcode": "00725"
+      },
+      {
+        "customerFName": "Melissa",
+        "customerLName": "Smith",
+        "customerEmail": "XXXXXXXXX",
+        "customerPassword": "XXXXXXXXX",
+        "customerStreet": "8598 Harvest Beacon Plaza",
+        "customerCity": "Stafford",
+        "customerState": "VA",
+        "customerZipcode": "22554"
+      }
+    ]
+  }
