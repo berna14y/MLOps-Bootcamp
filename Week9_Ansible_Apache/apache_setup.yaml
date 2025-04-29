@@ -1,0 +1,35 @@
+---
+- name: Install and configure Apache on test and prod servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Apache (httpd)
+      yum:
+        name: httpd
+        state: present
+
+    - name: Create custom index.html
+      copy:
+        content: |
+          <html>
+          <body>
+          <h1>My name is Berna Yılmaz on {{ server_type }}</h1>
+          </body>
+          </html>
+        dest: /var/www/html/index.html
+
+    - name: Configure Apache to listen on custom port
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen '
+        line: 'Listen {{ httpd_port }}'
+      notify: Restart Apache
+
+    - name: Start Apache service manually
+      command: /usr/sbin/httpd
+      args:
+        creates: /var/run/httpd/httpd.pid
+
+  handlers:
+    - name: Restart Apache
+      command: /usr/sbin/httpd -k restart

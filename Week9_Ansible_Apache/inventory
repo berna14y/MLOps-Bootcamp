@@ -1,0 +1,5 @@
+[test]
+test_server ansible_host=test_server ansible_user=root ansible_password=Ankara_06 ansible_ssh_common_args="-o StrictHostKeyChecking=no"
+
+[prod]
+prod_server ansible_host=prod_server ansible_user=root ansible_password=Ankara_06 ansible_ssh_common_args="-o StrictHostKeyChecking=no"
