@@ -1,0 +1,471 @@
+
+(base) bernayilmaz@MacBookPro docker_container % docker-compose up -d
+[+] Running 3/3
+ ✔ Network docker_container_vbo  Created                                               0.0s 
+ ✔ Container mysql               Started                                               0.3s 
+ ✔ Container postgresql          Started                                               0.3s 
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it mysql mysql -u root -p
+
+Enter password: 
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it mysql mysql -u root -p
+
+Enter password: 
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+
+
+---------------POSTGRESQL-----------------
+
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it postgresql psql -U postgres 
+
+psql (15.10 (Debian 15.10-1.pgdg120+1))
+Type "help" for help.
+
+postgres=# CREATE DATABASE mlops;
+CREATE USER 'mlops_user'@'%' IDENTIFIED BY 'mlops_pass';
+GRANT ALL PRIVILEGES ON mlops.* TO 'mlops_user'@'%';
+FLUSH PRIVILEGES;
+ERROR:  database "mlops" already exists
+ERROR:  syntax error at or near "'mlops_user'"
+LINE 1: CREATE USER 'mlops_user'@'%' IDENTIFIED BY 'mlops_pass';
+                    ^
+ERROR:  syntax error at or near "TO"
+LINE 1: GRANT ALL PRIVILEGES ON mlops.* TO 'mlops_user'@'%';
+                                        ^
+ERROR:  syntax error at or near "FLUSH"
+LINE 1: FLUSH PRIVILEGES;
+        ^
+postgres=# CREATE DATABASE mlops;
+CREATE USER mlops_user WITH ENCRYPTED PASSWORD 'mlops_pass';
+GRANT ALL PRIVILEGES ON DATABASE mlops TO mlops_user;
+ERROR:  database "mlops" already exists
+ERROR:  role "mlops_user" already exists
+GRANT
+postgres=# wget https://raw.githubusercontent.com/erkansirin78/datasets/master/retail_db/customers.csv -O customers.csv
+postgres-# head -n 6 customers.csv > customers_5.csv
+postgres-# exit
+Use \q to quit.
+postgres-# \q
+(base) bernayilmaz@MacBookPro docker_container % wget https://raw.githubusercontent.com/erkansirin78/datasets/master/retail_db/customers.csv -O customers.csv
+
+--2025-01-30 23:04:26--  https://raw.githubusercontent.com/erkansirin78/datasets/master/retail_db/customers.csv
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.109.133, 185.199.110.133, 185.199.111.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.109.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 953847 (931K) [text/plain]
+Saving to: ‘customers.csv’
+
+customers.csv          100%[============================>] 931.49K  1.55MB/s    in 0.6s    
+
+2025-01-30 23:04:28 (1.55 MB/s) - ‘customers.csv’ saved [953847/953847]
+
+(base) bernayilmaz@MacBookPro docker_container % head -n 6 customers.csv > customers_5.csv
+
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it postgresql psql -U postgres -d mlops
+psql (15.10 (Debian 15.10-1.pgdg120+1))
+Type "help" for help.
+
+mlops=# CREATE TABLE customer (
+    customer_id INT PRIMARY KEY,
+    customer_fname VARCHAR(50),
+    customer_lname VARCHAR(50),
+    customer_email VARCHAR(100),
+    customer_password VARCHAR(100),
+    customer_street VARCHAR(255),
+    customer_city VARCHAR(50),
+    customer_state VARCHAR(50),
+    customer_zipcode VARCHAR(10)
+);
+CREATE TABLE
+mlops=# COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+ERROR:  could not open file "/customers_5.csv" for reading: No such file or directory
+HINT:  COPY FROM instructs the PostgreSQL server process to read a file. You may want a client-side facility such as psql's \copy.
+mlops=# \copy customer FROM 'customers_5.csv' DELIMITER ',' CSV HEADER;
+customers_5.csv: No such file or directory
+mlops=# \q
+(base) bernayilmaz@MacBookPro docker_container % docker cp customers_5.csv postgresql:/customers_5.csv
+
+Successfully copied 2.05kB to postgresql:/customers_5.csv
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it postgresql bash
+
+root@ad76fd477bf8:/# ls -l /
+total 60
+lrwxrwxrwx   1 root root       7 Jan 13 00:00 bin -> usr/bin
+drwxr-xr-x   2 root root    4096 Dec 31 10:25 boot
+-rw-r--r--   1  501 dialout  506 Jan 30 20:04 customers_5.csv
+drwxr-xr-x   5 root root     340 Jan 30 20:00 dev
+drwxr-xr-x   2 root root    4096 Jan 14 06:06 docker-entrypoint-initdb.d
+drwxr-xr-x   1 root root    4096 Jan 30 20:00 etc
+drwxr-xr-x   2 root root    4096 Dec 31 10:25 home
+lrwxrwxrwx   1 root root       7 Jan 13 00:00 lib -> usr/lib
+drwxr-xr-x   2 root root    4096 Jan 13 00:00 media
+drwxr-xr-x   2 root root    4096 Jan 13 00:00 mnt
+drwxr-xr-x   2 root root    4096 Jan 13 00:00 opt
+dr-xr-xr-x 224 root root       0 Jan 30 20:00 proc
+drwx------   1 root root    4096 Jan 30 20:04 root
+drwxr-xr-x   1 root root    4096 Jan 14 06:14 run
+lrwxrwxrwx   1 root root       8 Jan 13 00:00 sbin -> usr/sbin
+drwxr-xr-x   2 root root    4096 Jan 13 00:00 srv
+dr-xr-xr-x  11 root root       0 Jan 30 20:00 sys
+drwxrwxrwt   2 root root    4096 Jan 13 00:00 tmp
+drwxr-xr-x   1 root root    4096 Jan 13 00:00 usr
+drwxr-xr-x   1 root root    4096 Jan 13 00:00 var
+root@ad76fd477bf8:/# ls
+bin   customers_5.csv  docker-entrypoint-initdb.d  home  media  opt   root  sbin  sys  usr
+boot  dev              etc                         lib   mnt    proc  run   srv   tmp  var
+root@ad76fd477bf8:/# docker exec -it postgresql psql -U postgres -d mlops
+bash: docker: command not found
+root@ad76fd477bf8:/# exit
+exit
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it postgresql psql -U postgres -d mlops
+
+psql (15.10 (Debian 15.10-1.pgdg120+1))
+Type "help" for help.
+
+mlops=# COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+COPY 5
+mlops=# docker exec -it postgresql chmod 644 /customers_5.csv
+mlops-# COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+ERROR:  syntax error at or near "docker"
+LINE 1: docker exec -it postgresql chmod 644 /customers_5.csv
+        ^
+mlops=# COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+ERROR:  duplicate key value violates unique constraint "customer_pkey"
+DETAIL:  Key (customer_id)=(1) already exists.
+CONTEXT:  COPY customer, line 2
+mlops=# TRUNCATE TABLE customer RESTART IDENTITY CASCADE;
+TRUNCATE TABLE
+mlops=# COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+COPY 5
+mlops=# CREATE TABLE IF NOT EXISTS customer (
+    customer_id INT PRIMARY KEY,
+    customer_fname VARCHAR(50),
+    customer_lname VARCHAR(50),
+    customer_email VARCHAR(100),
+    customer_password VARCHAR(100),
+    customer_street VARCHAR(255),
+    customer_city VARCHAR(50),
+    customer_state VARCHAR(50),
+    customer_zipcode VARCHAR(10)
+);
+NOTICE:  relation "customer" already exists, skipping
+CREATE TABLE
+mlops=# \q
+(base) bernayilmaz@MacBookPro docker_container % docker cp customers_5.csv postgresql:/customers_5.csv
+
+Successfully copied 2.05kB to postgresql:/customers_5.csv
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it postgresql psql -U postgres -d mlops
+
+psql (15.10 (Debian 15.10-1.pgdg120+1))
+Type "help" for help.
+
+mlops=# COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+ERROR:  duplicate key value violates unique constraint "customer_pkey"
+DETAIL:  Key (customer_id)=(1) already exists.
+CONTEXT:  COPY customer, line 2
+mlops=# \copy customer FROM 'customers_5.csv' DELIMITER ',' CSV HEADER;
+ERROR:  duplicate key value violates unique constraint "customer_pkey"
+DETAIL:  Key (customer_id)=(1) already exists.
+CONTEXT:  COPY customer, line 2
+mlops=# UPDATE customer SET customer_lname = 'Fox' WHERE customer_id = 3;
+UPDATE 1
+mlops=# UPDATE customer SET customer_lname = 'Fox' WHERE customer_id = 3;
+UPDATE 1
+mlops=# DELETE FROM customer WHERE customer_id = 5;
+DELETE 1
+mlops=# SELECT customer_street, customer_city, customer_state, customer_zipcode 
+FROM customer 
+WHERE customer_fname = 'Marry';
+ customer_street | customer_city | customer_state | customer_zipcode 
+-----------------+---------------+----------------+------------------
+(0 rows)
+
+mlops=# grep 'Marry' customers.csv
+mlops-# \q
+(base) bernayilmaz@MacBookPro docker_container % grep 'Marry' customers.csv
+
+(base) bernayilmaz@MacBookPro docker_container % grep 'Marry' /Users/bernayilmaz/docker_container/customers.csv
+
+grep: /Users/bernayilmaz/docker_container/customers.csv: No such file or directory
+(base) bernayilmaz@MacBookPro docker_container % grep 'Marry' /Users/bernayilmaz/Desktop/docker_container/customers.csv
+(base) bernayilmaz@MacBookPro docker_container % docker cp customers.csv postgresql:/customers.csv
+
+Successfully copied 955kB to postgresql:/customers.csv
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it postgresql psql -U postgres -d mlops
+
+psql (15.10 (Debian 15.10-1.pgdg120+1))
+Type "help" for help.
+
+mlops=# SELECT customer_street, customer_city, customer_state, customer_zipcode 
+FROM customer 
+WHERE customer_fname = 'Marry';
+ customer_street | customer_city | customer_state | customer_zipcode 
+-----------------+---------------+----------------+------------------
+(0 rows)
+
+mlops=# exit
+
+
+
+
+-------MYSQL--------
+
+
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it mysql bash
+
+bash-4.4# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 13
+Server version: 8.0.31 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> CREATE DATABASE mlops;
+' IDENTIFIED BY 'mlops_pass';
+GRANT ALL PRIVILEGES ON mlops.* TO 'mlops_user'@'%';
+FLUSH PRIVILEGES;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> CREATE USER 'mlops_user'@'%' IDENTIFIED BY 'mlops_pass';
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> GRANT ALL PRIVILEGES ON mlops.* TO 'mlops_user'@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> USE mlops;
+Database changed
+mysql> CREATE TABLE customer (
+    ->     customer_id INT PRIMARY KEY,
+    ->     customer_fname VARCHAR(50),
+    ->     customer_lname VARCHAR(50),
+    ->     customer_email VARCHAR(100),
+    ->     customer_password VARCHAR(100),
+    ->     customer_street VARCHAR(255),
+    ->     customer_city VARCHAR(50),
+    ->     customer_state VARCHAR(50),
+    ->     customer_zipcode VARCHAR(10)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> exit;
+Bye
+bash-4.4# \q
+bash: q: command not found
+bash-4.4# /q
+bash: /q: No such file or directory
+bash-4.4# exit
+exit
+(base) bernayilmaz@MacBookPro docker_container % docker cp customers_5.csv mysql:/customers_5.csv
+
+Successfully copied 2.05kB to mysql:/customers_5.csv
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it mysql mysql -u root -p mlops
+
+Enter password: 
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 14
+Server version: 8.0.31 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> LOAD DATA INFILE '/customers_5.csv'
+    -> INTO TABLE customer
+    -> FIELDS TERMINATED BY ','
+    -> ENCLOSED BY '"'
+    -> LINES TERMINATED BY '\n'
+    -> IGNORE 1 ROWS;
+ERROR 1290 (HY000): The MySQL server is running with the --secure-file-priv option so it cannot execute this statement
+mysql> LOAD DATA LOCAL INFILE '/customers_5.csv'
+    -> exit;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'exit' at line 2
+mysql> LOAD DATA LOCAL INFILE '/customers_5.csv'
+    -> INTO TABLE customer
+    -> FIELDS TERMINATED BY ','
+    -> ENCLOSED BY '"'
+    -> LINES TERMINATED BY '\n'
+    -> IGNORE 1 ROWS;
+ERROR 3948 (42000): Loading local data is disabled; this must be enabled on both the client and server sides
+mysql> COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER' at line 1
+mysql> exit
+Bye
+(base) bernayilmaz@MacBookPro docker_container % docker cp customers_5.csv mysql:/var/lib/mysql-files/customers_5.csv
+
+Successfully copied 2.05kB to mysql:/var/lib/mysql-files/customers_5.csv
+(base) bernayilmaz@MacBookPro docker_container % docker exec -it mysql mysql -u root -p mlops
+
+Enter password: 
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 15
+Server version: 8.0.31 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> LOAD DATA INFILE '/var/lib/mysql-files/customers_5.csv'
+    -> INTO TABLE customer
+    -> FIELDS TERMINATED BY ','
+    -> ENCLOSED BY '"'
+    -> LINES TERMINATED BY '\n'
+    -> IGNORE 1 ROWS;
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+
+mysql> SELECT * FROM customer;
++-------------+----------------+----------------+----------------+-------------------+-------------------------+---------------+----------------+------------------+
+| customer_id | customer_fname | customer_lname | customer_email | customer_password | customer_street         | customer_city | customer_state | customer_zipcode |
++-------------+----------------+----------------+----------------+-------------------+-------------------------+---------------+----------------+------------------+
+|           1 | Richard        | Hernandez      | XXXXXXXXX      | XXXXXXXXX         | 6303 Heather Plaza      | Brownsville   | TX             | 78521            |
+|           2 | Mary           | Barrett        | XXXXXXXXX      | XXXXXXXXX         | 9526 Noble Embers Ridge | Littleton     | CO             | 80126            |
+|           3 | Ann            | Smith          | XXXXXXXXX      | XXXXXXXXX         | 3422 Blue Pioneer Bend  | Caguas        | PR             | 00725            |
+|           4 | Mary           | Jones          | XXXXXXXXX      | XXXXXXXXX         | 8324 Little Common      | San Marcos    | CA             | 92069            |
+|           5 | Robert         | Hudson         | XXXXXXXXX      | XXXXXXXXX         | 10 Crystal River Mall   | Caguas        | PR             | 00725            |
++-------------+----------------+----------------+----------------+-------------------+-------------------------+---------------+----------------+------------------+
+5 rows in set (0.00 sec)
+
+mysql> UPDATE customer 
+    -> SET customer_lname = 'Fox' 
+    -> WHERE customer_id = 3;
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM customer WHERE customer_id = 3;
++-------------+----------------+----------------+----------------+-------------------+------------------------+---------------+----------------+------------------+
+| customer_id | customer_fname | customer_lname | customer_email | customer_password | customer_street        | customer_city | customer_state | customer_zipcode |
++-------------+----------------+----------------+----------------+-------------------+------------------------+---------------+----------------+------------------+
+|           3 | Ann            | Fox            | XXXXXXXXX      | XXXXXXXXX         | 3422 Blue Pioneer Bend | Caguas        | PR             | 00725            |
++-------------+----------------+----------------+----------------+-------------------+------------------------+---------------+----------------+------------------+
+1 row in set (0.01 sec)
+
+mysql> DELETE FROM customer 
+    -> WHERE customer_id = 5;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM customer WHERE customer_id = 5;
+Empty set (0.00 sec)
+
+mysql> SELECT customer_street, customer_city, customer_state, customer_zipcode
+    -> FROM customer 
+    -> WHERE customer_fname = 'Marry';
+Empty set (0.01 sec)
+
+mysql> SELECT customer_street, customer_city, customer_state, customer_zipcode
+    -> FROM customer 
+    -> WHERE customer_fname = 'Marry';
+Empty set (0.01 sec)
+
+mysql> exit
+
+
+
+------HOMEWORK-----
+The following commands will be run in order. I have indicated the parts that require separate commands for Mysql and Postgresql.
+
+1)Create mlops Database and mlops_user on Both Databases
+
+docker exec -it mysql mysql -u root -p /  docker exec -it postgresql psql -U postgres
+
+
+CREATE DATABASE mlops;
+CREATE USER 'mlops_user'@'%' IDENTIFIED BY 'mlops_pass';
+GRANT ALL PRIVILEGES ON mlops.* TO 'mlops_user'@'%';
+FLUSH PRIVILEGES;
+exit;
+
+OR 
+
+CREATE DATABASE mlops;
+CREATE USER mlops_user WITH ENCRYPTED PASSWORD 'mlops_pass';
+GRANT ALL PRIVILEGES ON DATABASE mlops TO mlops_user;
+
+
+2)Create customer Table in Both Databases
+
+docker exec -it mysql mysql -u root -p mlops / docker exec -it postgresql psql -U postgres -d mlops
+
+
+CREATE TABLE customer (
+    customer_id INT PRIMARY KEY,
+    customer_fname VARCHAR(50),
+    customer_lname VARCHAR(50),
+    customer_email VARCHAR(100),
+    customer_password VARCHAR(100),
+    customer_street VARCHAR(255),
+    customer_city VARCHAR(50),
+    customer_state VARCHAR(50),
+    customer_zipcode VARCHAR(10)
+);
+exit;
+
+
+3)Load the First 5 Records from CSV into Both Databases
+
+Copy customers_5.csv to Both Containers
+docker cp customers_5.csv mysql:/customers_5.csv
+docker cp customers_5.csv postgresql:/customers_5.csv
+
+docker exec -it mysql mysql -u root -p mlops /  docker exec -it mysql mysql -u root -p mlops
+
+For MYSQL:
+
+LOAD DATA INFILE '/customers_5.csv'
+INTO TABLE customer
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+For POSTGRESQL:
+COPY customer FROM '/customers_5.csv' DELIMITER ',' CSV HEADER;
+
+exit;
+
+4)Update Last Name for customer_id = 3 to Fox
+
+docker exec -it mysql mysql -u root -p mlops / docker exec -it postgresql psql -U postgres -d mlops
+
+UPDATE customer SET customer_lname = 'Fox' WHERE customer_id = 3;
+exit;
+
+5)Delete customer_id = 5 (Robert Hudson)
+
+docker exec -it mysql mysql -u root -p mlops / docker exec -it postgresql psql -U postgres -d mlops
+
+DELETE FROM customer WHERE customer_id = 5;
+exit;
+
+6)Select Marry Users' Address Information
+
+docker exec -it mysql mysql -u root -p mlops / docker exec -it postgresql psql -U postgres -d mlops
+
+SELECT customer_street, customer_city, customer_state, customer_zipcode 
+FROM customer 
+WHERE customer_fname = 'Marry';
+exit;
+
