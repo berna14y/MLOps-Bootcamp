@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  fastapi:
+    build: ./fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi:/app
+    networks:
+      - app-network
+
+  streamlit:
+    build: ./streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit:/app
+    depends_on:
+      - fastapi
+    command: streamlit run app.py --server.port 8501 --server.enableCORS false
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
